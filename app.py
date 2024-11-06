@@ -88,15 +88,14 @@ unique_summary = summarize_dataframe(filtered_df)
 # non-aggregate visualizations (deduplicated/unique pokemon df usually)
 plotter = Plotter(title="", xlabel="card type", ylabel="Percentage")
 fig = plotter.plot_is_columns_bar_plot(unique_summary)
-st.subheader(f"Card types breakdown out of all unique, scraped cards ({len(unique_df)})")
+st.subheader(f"Card types among the unique, scraped cards ({len(unique_df)})")
 st.pyplot(fig)
 st.markdown(f'- og_char: {feature_descriptions["is_og_char"]}')
 st.markdown(f'- legendary: {feature_descriptions["is_legendary"]}')
-st.markdown("---")
 
 
 card_types = query_all_card_types()
-st.markdown(f"{len(card_types)} most common card types (50 or more cards)")
+st.subheader(f"{len(card_types)} most common PSA card types (50+ only)")
 
 plotter = Plotter(title="Card Type Histogram", xlabel="Card Type", ylabel="Frequency")
 # Plot histogram of card types with at least 3 occurrences
