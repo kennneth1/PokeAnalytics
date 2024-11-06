@@ -39,7 +39,7 @@ class Plotter:
         fig, ax = plt.subplots(figsize=self.figsize)
 
         if kind == "line":
-            sns.lineplot(data=data, x=x, y=y, hue=hue, marker=marker, ax=ax)
+            sns.lineplot(data=data, x=x, y=y, hue=hue, marker=marker, ax=ax, linewidth=2.5, markersize=7)
         elif kind == "scatter":
             sns.scatterplot(data=data, x=x, y=y, ax=ax)
         elif kind == "bar":
@@ -51,6 +51,7 @@ class Plotter:
         ax.set_ylabel(self.ylabel)
         ax.grid()
         ax.grid(visible=True, color='gray', linestyle='--', linewidth=0.5)
+        ax.tick_params(axis='both', which='major', labelsize=12)
 
         ax.legend(loc="upper left")
 

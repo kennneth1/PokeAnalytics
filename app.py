@@ -15,14 +15,16 @@ st.markdown(intro_md)
 data_load_state = st.text('loading data...')
 df = query_feature_set(limit=250000)
 data_load_state.text("Data loaded")
-df = df.drop(columns=["Unnamed: 0"])
+if "Unnamed: 0" in df.columns:
+    df = df.drop(columns=["Unnamed: 0"])
 
 # raw / summary
 summary_df = summarize_dataframe(df)
 
 # Selection and clipping
-start = '2021-07'
-end = '2024-07'
+start = '2021-01'
+end = str(datetime.now().month-1)
+
 filtered_df = select_by_date(df, start, end)
 start_formatted = datetime.strptime(start, "%Y-%m").strftime("%m-%Y")
 end_formatted = datetime.strptime(end, "%Y-%m").strftime("%m-%Y")
