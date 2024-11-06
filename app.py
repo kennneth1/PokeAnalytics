@@ -63,8 +63,14 @@ title = "Unripe sets (less than $700): sum of top 10 cards"
 st.subheader(title)
 top10_nm_card_mo_sum_in_winning_sets = modern_line_plts.plot_basic(baby_sets, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(top10_nm_card_mo_sum_in_winning_sets)
-st.markdown("---")
 
+modern_sets = filtered_df.loc[filtered_df.release_date>="2022"].reset_index()
+agg_modern_sets = agg_by_set(modern_sets)
+title = "Modern sets (2022+ release): sum of top 10 cards"
+st.subheader(title)
+top10_nm_card_mo_sum_modern = modern_line_plts.plot_basic(agg_modern_sets, x='date', y=feature, kind="line", hue="set_name", marker='o')
+st.pyplot(top10_nm_card_mo_sum_modern)
+st.markdown("---")
 
 ### Booster Boxes
 feature = "bb_mo_price_by_set"
@@ -149,7 +155,7 @@ st.markdown("---")
 
 
 
-st.write(" Thanks for visiting! 🚀 ")
-st.write("— Kenneth H.")
+st.write(" Thanks for visiting!")
 st.write("💡Have ideas or want to collaborate? Feel free to reach out!")
 st.write("[LinkedIn](https://www.linkedin.com/in/kennethh123/)|[Github](https://github.com/kennneth1)")
+st.write("— Kenneth H.")
