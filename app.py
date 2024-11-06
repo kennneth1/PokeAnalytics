@@ -1,6 +1,6 @@
 import streamlit as st
 from modules.cloud import query_feature_set, query_all_card_types
-from modules.processing import agg_by_set, agg_by_release, select_by_date, clip_sets, get_winners, get_ripe_boxes, get_baby_sets
+from modules.processing import agg_by_set, agg_by_release, select_by_date, clip_sets, get_winners, get_ripe_boxes, get_baby_sets, get_baby_boxes
 from modules.analysis import summarize_dataframe
 from modules.viz import Plotter
 from modules.config import feature_descriptions, intro_md
@@ -36,19 +36,20 @@ st.markdown("---")
 
 
 
-# aggregating by set, then by months released for life_time plots
+### Set Values
 agg_by_set_df = agg_by_set(filtered_df)
 agg_by_release_df = agg_by_release(filtered_df)
 
 modern_line_plts = Plotter(title="", xlabel="date (monthly)", ylabel="price (USD)")
 feature = "top10_nm_card_mo_sum_in_set"
-title = "All set card values: sum of top 10 cards"
+title = "All set card values: sum of top 10 cards" # basically ~= average cost of near mint
 st.subheader(title)
 top10_nm_card_mo_sum_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(top10_nm_card_mo_sum_in_set)
 
 big_sets = get_winners(agg_by_set_df)
 winners = agg_by_set_df[agg_by_set_df['set_name'].isin(big_sets)]
+winners=winners.loc[winners.date<="2024-09"]
 title = "Mid range sets ($700-1250): sum of top 10 cards"
 st.subheader(title)
 semi_winners = winners[~winners['set_name'].isin(['evolving-skies', 'team-up'])]
@@ -57,6 +58,7 @@ st.pyplot(top10_nm_card_mo_sum_in_winning_sets)
 
 small_sets = get_baby_sets(agg_by_set_df)
 baby_sets = agg_by_set_df[agg_by_set_df['set_name'].isin(small_sets)]
+baby_sets = baby_sets.loc[baby_sets.date<="2024-10"]
 title = "Unripe sets (less than $700): sum of top 10 cards"
 st.subheader(title)
 top10_nm_card_mo_sum_in_winning_sets = modern_line_plts.plot_basic(baby_sets, x='date', y=feature, kind="line", hue="set_name", marker='o')
@@ -64,19 +66,51 @@ st.pyplot(top10_nm_card_mo_sum_in_winning_sets)
 st.markdown("---")
 
 
+### Booster Boxes
 feature = "bb_mo_price_by_set"
 title = "All booster boxes: sell prices"
 st.subheader(title)
 bb_mo_price_by_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(bb_mo_price_by_set)
 
-# set_names where their bb price over 500 but not over 1000
 ripe_boxes_set_names = get_ripe_boxes(agg_by_set_df)
 ripe_boxes = agg_by_set_df[agg_by_set_df['set_name'].isin(ripe_boxes_set_names)]
 title = "Mid range booster boxes: sell price \$500-$1000"
 st.subheader(title)
 bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(ripe_boxes, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(bb_mo_price_by_set_ripe)
+
+young_boxes_set_names = get_baby_boxes(agg_by_set_df)
+young_boxes = agg_by_set_df[agg_by_set_df['set_name'].isin(young_boxes_set_names)]
+title = "Young booster boxes: sell price <$500"
+st.subheader(title)
+bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(young_boxes, x='date', y=feature, kind="line", hue="set_name", marker='o')
+st.pyplot(bb_mo_price_by_set_ripe)
+
+st.markdown("---")
+
+### --- Other comparisons
+title = "Average PSA 10 Price per set"
+st.subheader(title)
+
+feature = 'avg_mo_price_psa_10_in_set'
+avg_mo_price_psa_10_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
+st.pyplot(avg_mo_price_psa_10_in_set)
+
+feature = 'avg_mo_price_sealed_in_set'
+title = "Average sealed price per set"
+st.subheader(title)
+avg_mo_price_sealed_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
+st.pyplot(avg_mo_price_sealed_in_set)
+
+
+modern_line_plts = Plotter(title="", xlabel="date (monthly)", ylabel="")
+feature = 'top10_mo_card_sum_to_bb_cost_ratio'
+title = "Top 10 card value to Booster box cost ratio"
+st.subheader(title)
+top10_mo_card_sum_to_bb_cost_ratio = modern_line_plts.plot_basic(agg_by_set_df.loc[agg_by_set_df.date>='2022-01'], x='date', y=feature, kind="line", hue="set_name", marker='o')
+st.pyplot(top10_mo_card_sum_to_bb_cost_ratio)
+
 st.markdown("---")
 
 # deduplicate and copy
@@ -95,7 +129,7 @@ st.markdown(f'- legendary: {feature_descriptions["is_legendary"]}')
 
 
 card_types = query_all_card_types()
-st.subheader(f"{len(card_types)} most common PSA card types (50+ only)")
+st.subheader(f"{len(card_types)} most common PSA card types (50+ req.)")
 
 plotter = Plotter(title="Card Type Histogram", xlabel="Card Type", ylabel="Frequency")
 # Plot histogram of card types with at least 3 occurrences

@@ -19,13 +19,14 @@ def agg_by_set(df):
     df['date'] = pd.to_datetime(df['date'])
 
     df.set_index('date', inplace=True)
-
     agg = df.groupby(['set_name']).resample('M').agg({
         'avg_mo_price_sealed_in_set': 'mean',
         'avg_mo_price_card_in_set': 'mean',
         'top10_nm_card_mo_avg_in_set': 'mean',
         'top10_nm_card_mo_sum_in_set': 'mean',
-        'bb_mo_price_by_set' : 'mean'
+        'bb_mo_price_by_set' : 'mean',
+        'avg_mo_price_psa_10_in_set' : 'mean',
+        'top10_mo_card_sum_to_bb_cost_ratio' : 'mean'
     }).reset_index()
 
     return agg
@@ -36,7 +37,9 @@ def agg_by_release(df):
         'avg_mo_price_card_in_set': 'mean',
         'top10_nm_card_mo_avg_in_set': 'mean',
         'top10_nm_card_mo_sum_in_set': 'mean',
-        'bb_mo_price_by_set' : 'mean'
+        'bb_mo_price_by_set' : 'mean',
+        'avg_mo_price_psa_10_in_set' : 'mean',
+        'top10_mo_card_sum_to_bb_cost_ratio' : 'mean'
     })
 
     # Create a new DataFrame to fill in missing months for each set
@@ -72,6 +75,12 @@ def get_ripe_boxes(df):
 
     # max 'bb_mo_price_by_set' is between 500 and 1000
     filtered_sets = grouped[(grouped >= 500) & (grouped <= 1000)].index.tolist()
+    return filtered_sets
+
+def get_baby_boxes(df):
+    grouped = df.groupby('set_name')['bb_mo_price_by_set'].max()
+
+    filtered_sets = grouped[(grouped <= 200)].index.tolist()
     return filtered_sets
 
 def get_baby_sets(df):
