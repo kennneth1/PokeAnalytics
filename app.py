@@ -13,7 +13,7 @@ st.markdown(intro_md)
 
 
 data_load_state = st.text('loading data...')
-df = query_feature_set(limit=1000)
+df = query_feature_set(limit=300000)
 data_load_state.text("Data loaded")
 if "Unnamed: 0" in df.columns:
     df = df.drop(columns=["Unnamed: 0"])
