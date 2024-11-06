@@ -5,6 +5,7 @@ from modules.analysis import summarize_dataframe
 from modules.viz import Plotter
 from modules.config import feature_descriptions, intro_md
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 st.set_page_config(page_title="Pokémon Market Analysis", layout="centered")
 
@@ -34,6 +35,8 @@ filtered_df = clip_sets(filtered_df)
 st.markdown(f'*data of dimensions: {filtered_df.shape}*')
 st.markdown("---")
 
+last_month = datetime.today()- relativedelta(months=1)
+clipped_tail = last_month.strftime("%Y-%m")
 
 
 ### Set Values
@@ -49,7 +52,7 @@ st.pyplot(top10_nm_card_mo_sum_in_set)
 
 big_sets = get_winners(agg_by_set_df)
 winners = agg_by_set_df[agg_by_set_df['set_name'].isin(big_sets)]
-winners=winners.loc[winners.date<="2024-09"]
+winners=winners.loc[winners.date<clipped_tail]
 title = "Mid range sets ($700-1250): sum of top 10 cards"
 st.subheader(title)
 semi_winners = winners[~winners['set_name'].isin(['evolving-skies', 'team-up'])]
@@ -58,13 +61,14 @@ st.pyplot(top10_nm_card_mo_sum_in_winning_sets)
 
 small_sets = get_baby_sets(agg_by_set_df)
 baby_sets = agg_by_set_df[agg_by_set_df['set_name'].isin(small_sets)]
-baby_sets = baby_sets.loc[baby_sets.date<="2024-10"]
+baby_sets = baby_sets.loc[baby_sets.date<=clipped_tail]
 title = "Unripe sets (less than $700): sum of top 10 cards"
 st.subheader(title)
 top10_nm_card_mo_sum_in_winning_sets = modern_line_plts.plot_basic(baby_sets, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(top10_nm_card_mo_sum_in_winning_sets)
 
 modern_sets = filtered_df.loc[filtered_df.release_date>="2022"].reset_index()
+modern_sets = modern_sets.loc[modern_sets.date<clipped_tail]
 agg_modern_sets = agg_by_set(modern_sets)
 title = "Modern sets (2022+ release): sum of top 10 cards"
 st.subheader(title)

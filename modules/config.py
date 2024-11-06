@@ -28,4 +28,4 @@ feature_descriptions = {
 
 intro_md = "EDA on modern, Pokémon card price data, scraped and merged from PriceCharting, PSA, and Google Trends. The data is updated monthly, with each update reflecting the previous month's average sold prices from PriceCharting. \
     \n- *For each item, PriceCharting provides historical prices on a monthly (average) basis, going as far back as January 2021; the scrapers gather this data for the top 50 most expensive pokemon products in every mid-modern to modern set - this includes NM, PSA, and BGS9.5 prices*     \
-    \n- *In progress: merging with Google Trends and PSA population reports*"
+    \n- *In progress: bringing in Google Trends and PSA population reports, interactive plots, price correlation analysis*"
