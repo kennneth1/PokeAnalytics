@@ -23,7 +23,7 @@ summary_df = summarize_dataframe(df)
 
 # Selection and clipping
 start = '2021-01'
-end = str(datetime.now().month-1)
+end = '2024-11'
 
 filtered_df = select_by_date(df, start, end)
 start_formatted = datetime.strptime(start, "%Y-%m").strftime("%m-%Y")
