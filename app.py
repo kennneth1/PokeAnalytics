@@ -82,7 +82,7 @@ st.pyplot(bb_mo_price_by_set_ripe)
 
 young_boxes_set_names = get_baby_boxes(agg_by_set_df)
 young_boxes = agg_by_set_df[agg_by_set_df['set_name'].isin(young_boxes_set_names)]
-title = "Young booster boxes: sell price <$500"
+title = "Cheaper booster boxes: sell price <$200"
 st.subheader(title)
 bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(young_boxes, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(bb_mo_price_by_set_ripe)

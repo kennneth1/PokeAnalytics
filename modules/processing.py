@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from modules.config import feature_descriptions
 
 
 def conform_dtypes(df):
@@ -19,7 +18,7 @@ def agg_by_set(df):
     df['date'] = pd.to_datetime(df['date'])
 
     df.set_index('date', inplace=True)
-    agg = df.groupby(['set_name']).resample('M').agg({
+    agg = df.groupby(['set_name']).resample('ME').agg({
         'avg_mo_price_sealed_in_set': 'mean',
         'avg_mo_price_card_in_set': 'mean',
         'top10_nm_card_mo_avg_in_set': 'mean',

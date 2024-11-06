@@ -116,10 +116,10 @@ class Plotter:
         sorted_data = data.sort_values(by=weights_column, ascending=True)
 
         # Plot using seaborn's histplot with weights
-        sns.histplot(data=sorted_data, x=x, weights=sorted_data[weights_column], bins=bins, ax=ax)
+        sns.histplot(data=sorted_data, x=x, weights=sorted_data[weights_column], bins=bins, ax=ax, alpha=1)
 
         ax.set_title(self.title)
-        ax.set_xlabel(self.xlabel)
+        ax.set_xlabel(self.xlabel, fontsize=14)
         ax.set_ylabel(self.ylabel)
         plt.xticks(rotation=45)
         ax.grid(visible=True, color='gray', linestyle='--', linewidth=0.5)

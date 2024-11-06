@@ -26,6 +26,6 @@ feature_descriptions = {
     "max_mo_price_psa_10_in_set": "Maximum market price of PSA 10 cards per set"
 }
 
-intro_md = "Exploring and visualizing modern, Pokémon card price data, scraped and merged from PriceCharting, PSA, and Google Trends. The data is updated monthly, with each update reflecting the previous month's average sold prices from PriceCharting. \
-    \n- *For each item, PriceCharting provides prices on a monthly (average) granularity, going as far back as January 2021; the scrapers gather this data for the top 50 most expensive pokemon products in every mid-modern to modern set - this includes NM, PSA, and BGS9.5 prices*     \
+intro_md = "EDA hub for modern, Pokémon card price data, scraped and merged from PriceCharting, PSA, and Google Trends. The data is updated monthly, with each update reflecting the previous month's average sold prices from PriceCharting. \
+    \n- *For each item, PriceCharting provides historical prices on a monthly (average) basis, going as far back as January 2021; the scrapers gather this data for the top 50 most expensive pokemon products in every mid-modern to modern set - this includes NM, PSA, and BGS9.5 prices*     \
     \n- *In progress: merging with Google Trends and PSA population reports*"
