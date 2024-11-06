@@ -49,7 +49,7 @@ st.pyplot(top10_nm_card_mo_sum_in_set)
 
 big_sets = get_winners(agg_by_set_df)
 winners = agg_by_set_df[agg_by_set_df['set_name'].isin(big_sets)]
-title = "Mid range sets ($700-1250) sets: sum of top 10 cards"
+title = "Mid range sets ($700-1250): sum of top 10 cards"
 st.subheader(title)
 semi_winners = winners[~winners['set_name'].isin(['evolving-skies', 'team-up'])]
 top10_nm_card_mo_sum_in_winning_sets = modern_line_plts.plot_basic(semi_winners, x='date', y=feature, kind="line", hue="set_name", marker='o')
@@ -65,7 +65,7 @@ st.markdown("---")
 
 
 feature = "bb_mo_price_by_set"
-title = "Booster boxes: sell price across sets"
+title = "All booster boxes: sell prices"
 st.subheader(title)
 bb_mo_price_by_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(bb_mo_price_by_set)
