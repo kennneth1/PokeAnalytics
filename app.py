@@ -49,6 +49,7 @@ title = "All set card values: sum of top 10 cards" # basically ~= average cost o
 st.subheader(title)
 top10_nm_card_mo_sum_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(top10_nm_card_mo_sum_in_set)
+st.markdown("\n")
 
 big_sets = get_winners(agg_by_set_df)
 winners = agg_by_set_df[agg_by_set_df['set_name'].isin(big_sets)]
@@ -58,6 +59,7 @@ st.subheader(title)
 semi_winners = winners[~winners['set_name'].isin(['evolving-skies', 'team-up'])]
 top10_nm_card_mo_sum_in_winning_sets = modern_line_plts.plot_basic(semi_winners, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(top10_nm_card_mo_sum_in_winning_sets)
+st.markdown("\n")
 
 small_sets = get_baby_sets(agg_by_set_df)
 baby_sets = agg_by_set_df[agg_by_set_df['set_name'].isin(small_sets)]
@@ -66,6 +68,7 @@ title = "Unripe sets (less than $700): sum of top 10 cards"
 st.subheader(title)
 top10_nm_card_mo_sum_in_winning_sets = modern_line_plts.plot_basic(baby_sets, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(top10_nm_card_mo_sum_in_winning_sets)
+st.markdown("\n")
 
 modern_sets = filtered_df.loc[filtered_df.release_date>="2022"].reset_index()
 modern_sets = modern_sets.loc[modern_sets.date<clipped_tail]
@@ -74,6 +77,8 @@ title = "Modern sets (2022+ release): sum of top 10 cards"
 st.subheader(title)
 top10_nm_card_mo_sum_modern = modern_line_plts.plot_basic(agg_modern_sets, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(top10_nm_card_mo_sum_modern)
+st.markdown("\n")
+
 st.markdown("---")
 
 ### Booster Boxes
@@ -83,6 +88,7 @@ st.subheader(title)
 exclude_words = ['crown-zenith', 'scarlet-&-violet-151', 'champions-path', 'paldean fates', 'hidden-fates', 'shining-fates']
 bb_mo_price_by_set = modern_line_plts.plot_basic(agg_by_set_df[~agg_by_set_df['set_name'].isin(exclude_words)], x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(bb_mo_price_by_set)
+st.markdown("\n")
 
 exclude_words = ['crown-zenith', 'scarlet-&-violet-151', 'champions-path', 'paldean fates', 'hidden-fates', 'shining-fates']
 ripe_boxes_set_names = get_ripe_boxes(agg_by_set_df)
@@ -92,6 +98,7 @@ exclude_words = ['crown-zenith', 'scarlet-&-violet-151', 'champions-path', 'pald
 st.subheader(title)
 bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(ripe_boxes, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(bb_mo_price_by_set_ripe)
+st.markdown("\n")
 
 
 young_boxes_set_names = get_baby_boxes(agg_by_set_df)
@@ -100,6 +107,7 @@ title = "Cheaper booster boxes: sell price <$200"
 st.subheader(title)
 bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(young_boxes, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(bb_mo_price_by_set_ripe)
+st.markdown("\n")
 
 st.markdown("---")
 
@@ -110,12 +118,14 @@ st.subheader(title)
 feature = 'avg_mo_price_psa_10_in_set'
 avg_mo_price_psa_10_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(avg_mo_price_psa_10_in_set)
+st.markdown("\n")
 
 feature = 'avg_mo_price_sealed_in_set'
 title = "Average sealed price per set"
 st.subheader(title)
 avg_mo_price_sealed_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(avg_mo_price_sealed_in_set)
+st.markdown("\n")
 
 
 modern_line_plts = Plotter(title="", xlabel="date (monthly)", ylabel="")
@@ -124,6 +134,8 @@ title = "Top 10 card value to Booster box cost ratio"
 st.subheader(title)
 top10_mo_card_sum_to_bb_cost_ratio = modern_line_plts.plot_basic(agg_by_set_df.loc[agg_by_set_df.date>='2022-01'], x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(top10_mo_card_sum_to_bb_cost_ratio)
+st.markdown("- i.e. a set with a \$500 total top 10 NM card cost, and a booster box cost of $100, has a ratio of 5.0")
+st.markdown("\n")
 
 st.markdown("---")
 
