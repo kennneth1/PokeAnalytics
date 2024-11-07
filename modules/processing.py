@@ -73,7 +73,7 @@ def get_ripe_boxes(df):
     grouped = df.groupby('set_name')['bb_mo_price_by_set'].max()
 
     # max 'bb_mo_price_by_set' is between 500 and 1000
-    filtered_sets = grouped[(grouped >= 500) & (grouped <= 1000)].index.tolist()
+    filtered_sets = grouped[(grouped >= 200) & (grouped <= 1500)].index.tolist()
     return filtered_sets
 
 def get_baby_boxes(df):

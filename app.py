@@ -80,15 +80,19 @@ st.markdown("---")
 feature = "bb_mo_price_by_set"
 title = "All booster boxes: sell prices"
 st.subheader(title)
-bb_mo_price_by_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
+exclude_words = ['crown-zenith', 'scarlet-&-violet-151', 'champions-path', 'paldean fates', 'hidden-fates', 'shining-fates']
+bb_mo_price_by_set = modern_line_plts.plot_basic(agg_by_set_df[~agg_by_set_df['set_name'].isin(exclude_words)], x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(bb_mo_price_by_set)
 
+exclude_words = ['crown-zenith', 'scarlet-&-violet-151', 'champions-path', 'paldean fates', 'hidden-fates', 'shining-fates']
 ripe_boxes_set_names = get_ripe_boxes(agg_by_set_df)
 ripe_boxes = agg_by_set_df[agg_by_set_df['set_name'].isin(ripe_boxes_set_names)]
-title = "Mid range booster boxes: sell price \$500-$1000"
+title = "Matured booster boxes: sell price \$200-$1000"
+exclude_words = ['crown-zenith', 'scarlet-&-violet-151', 'champions-path', 'paldean fates', 'hidden-fates', 'shining-fates']
 st.subheader(title)
 bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(ripe_boxes, x='date', y=feature, kind="line", hue="set_name", marker='o')
 st.pyplot(bb_mo_price_by_set_ripe)
+
 
 young_boxes_set_names = get_baby_boxes(agg_by_set_df)
 young_boxes = agg_by_set_df[agg_by_set_df['set_name'].isin(young_boxes_set_names)]
