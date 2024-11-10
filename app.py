@@ -6,6 +6,7 @@ from modules.viz import Plotter
 from modules.config import feature_descriptions, intro_md
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import requests
 
 st.set_page_config(page_title="Pokémon Market Analysis", layout="centered")
 
@@ -29,11 +30,88 @@ end = '2024-11' # yyyy-mm of current month
 filtered_df = select_by_date(df, start, end)
 start_formatted = datetime.strptime(start, "%Y-%m").strftime("%m-%Y")
 end_formatted = datetime.strptime(end, "%Y-%m").strftime("%m-%Y")
-st.markdown(f"""*selected data date range: ({start_formatted} to {end_formatted})*""")
 # remove 1st 2 months of release data per set
 filtered_df = clip_sets(filtered_df)
-st.markdown(f'*data of dimensions: {filtered_df.shape}*')
+
+
+
+
+##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
+title="Card Price Predictor"
+st.subheader(title)
+st.markdown(f"- deployed with FastAPI & Heroku\n- a tensorflow, XGBoost regressor model\n- trained on ~100,000 data points (monthly average sold) ")
+
+fastapi_url="https://"
+
+with st.form(key='input_form'):
+    # Collecting input from user
+    mos_since_release = st.text_input('Months since set was released', value="1")
+    num_grade = st.text_input('PSA Grade (enter 8 for near mint/raw cards)', value="8")
+    is_secret = st.checkbox('Secret rare')
+    is_full_art = st.checkbox('Full Art')
+    is_tag_team = st.checkbox('Tag Team')
+    is_alt_art = st.checkbox('Alt Art')
+    is_eeveelution = st.checkbox('Eeveelution')
+    is_legendary = st.checkbox('Legendary (gen1-4)')
+    is_og_char = st.checkbox('Charizard, Blastoise, Venusaur, Gengar, Alakazam, Snorlax, Pikachu, Dragonite, or Gyarados')
+    bb_mo_price_by_set = st.text_input('Set\'s Booster Box Price', value="100.0")
+    avg_mo_price_by_grade_set = st.text_input('Avg price of grade in the set', value="30.0")
+    ir_score = st.text_input('Illustration Rare Score (0=NA, 1=IR, 3=SIR)', value="0")
+    num_predictions = st.text_input('Number of predictions (1=current month, 2=current and next, so on)', value="1")
+
+    # Submit button for the form
+    submit_button = st.form_submit_button(label='Predict Price')
+
+# Convert input data to the appropriate format
+if submit_button:
+    input_data = {
+        "mos_since_release": int(mos_since_release),
+        "num_grade": int(num_grade),
+        "is_secret": int(is_secret),  # FastAPI expects boolean 0 or 1
+        "is_full_art": int(is_full_art),
+        "is_tag_team": int(is_tag_team),
+        "is_alt_art": int(is_alt_art),
+        "is_eeveelution": int(is_eeveelution),
+        "is_legendary": int(is_legendary),
+        "is_og_char": int(is_og_char),
+        "bb_mo_price_by_set": float(bb_mo_price_by_set),
+        "avg_mo_price_by_grade_set": float(avg_mo_price_by_grade_set),
+        "ir_score": int(ir_score),
+        "num_predictions": int(num_predictions)
+    }
+
+    # Send the data to the FastAPI model for prediction
+    try:
+        response = requests.post(fastapi_url, json=input_data)
+        
+        if response.status_code == 200:
+            # Parse and display the result
+            result = response.json()
+            st.write(f"Predicted Price: ${result['price']:.2f}")
+        else:
+            st.error(f"Error: {response.status_code} - {response.text}")
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+
+st.markdown("\n")
+
+agg_for_inputs = df.groupby(["set_name", "grade", "date"])["price"].mean().reset_index(name="avg_mo_price_by_grade_set")
+st.write(agg_for_inputs)
+
+sealed_only = df.loc[df.product_type!="card"]
+agg_for_inputs = sealed_only.groupby(["set_name", "grade", "date"])["bb_mo_price_by_set"].mean().reset_index(name="bb_mo_price_by_set")
+st.write(agg_for_inputs)
+
+st.markdown("\n")
+
+##------------------------------------------------------------------------------------------------------------
+st.markdown("---")
+st.title('Visualizing set performance')
+st.markdown("*Card Price Predictor was trained on a subset of this data* ")
+
+st.markdown(f"""- selected data date range: ({start_formatted} to {end_formatted})\n- data of dimension: {filtered_df.shape}""")
+
 
 last_month = datetime.today()- relativedelta(months=1)
 clipped_tail = last_month.strftime("%Y-%m")
