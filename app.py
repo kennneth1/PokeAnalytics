@@ -99,7 +99,7 @@ st.markdown("\n")
 
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-st.title('Visualizing set performance')
+st.subheader('Visualizing set performance')
 st.markdown("*Card Price Predictor was trained on a subset of this data* ")
 
 st.markdown(f"""- selected data date range: ({start_formatted} to {end_formatted})\n- data of dimension: {filtered_df.shape}""")
