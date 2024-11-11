@@ -38,7 +38,7 @@ filtered_df = clip_sets(filtered_df)
 
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-title="Price Movement Predictor"
+title="Price Movement Predictor (Releasing 11-30-24)"
 st.subheader(title)
 
 fastapi_url="https://"
@@ -92,7 +92,7 @@ st.markdown("\n")
 title="Feature Importance"
 st.subheader(title)
 image_path = "modules/images/feature_importance.png"
-st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, RSME~=60", use_column_width=True)
+#st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, RSME~=60", use_column_width=True)
 st.markdown("\n")
 
 ##------------------------------------------------------------------------------------------------------------
