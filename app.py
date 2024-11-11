@@ -10,7 +10,7 @@ import requests
 
 st.set_page_config(page_title="Pokémon Market Analysis", layout="centered")
 
-st.title('PokeAnalytics')
+#st.title('PokeAnalytics')
 st.markdown(intro_md)
 
 
