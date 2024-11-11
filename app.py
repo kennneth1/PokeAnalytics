@@ -6,7 +6,6 @@ from modules.viz import Plotter
 from modules.config import feature_descriptions, intro_md
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import requests
 
 st.set_page_config(page_title="Pokémon Market Analysis", layout="centered")
 
