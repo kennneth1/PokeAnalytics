@@ -38,7 +38,7 @@ filtered_df = clip_sets(filtered_df)
 
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-title="Price Movement Predictor (Releasing 11-30-24)"
+title="Price Movement Predictor (in progress)"
 st.subheader(title)
 
 fastapi_url="https://"
