@@ -38,16 +38,14 @@ filtered_df = clip_sets(filtered_df)
 
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-title="Card Price Predictor"
+title="Price Movement Predictor"
 st.subheader(title)
-st.markdown(f"- deployed with FastAPI & Heroku\n- a tensorflow, XGBoost regressor model\n- trained on ~100,000 data points (monthly average sold) ")
 
 fastapi_url="https://"
-
 with st.form(key='input_form'):
     # Collecting input from user
-    mos_since_release = st.text_input('Months since set was released', value="1")
-    num_grade = st.text_input('PSA Grade (enter 8 for near mint/raw cards)', value="8")
+    mos_since_release = st.text_input('Months since set was released', value=1)
+    num_grade = st.slider('PSA Grade (8 for near mint/raw cards)', min_value=1, max_value=10, value=8)
     is_secret = st.checkbox('Secret rare')
     is_full_art = st.checkbox('Full Art')
     is_tag_team = st.checkbox('Tag Team')
@@ -55,8 +53,6 @@ with st.form(key='input_form'):
     is_eeveelution = st.checkbox('Eeveelution')
     is_legendary = st.checkbox('Legendary (gen1-4)')
     is_og_char = st.checkbox('Charizard, Blastoise, Venusaur, Gengar, Alakazam, Snorlax, Pikachu, Dragonite, or Gyarados')
-    bb_mo_price_by_set = st.text_input('Set\'s Booster Box Price', value="100.0")
-    avg_mo_price_by_grade_set = st.text_input('Avg price of grade in the set', value="30.0")
     ir_score = st.text_input('Illustration Rare Score (0=NA, 1=IR, 3=SIR)', value="0")
     num_predictions = st.text_input('Number of predictions (1=current month, 2=current and next, so on)', value="1")
 
@@ -66,8 +62,8 @@ with st.form(key='input_form'):
 # Convert input data to the appropriate format
 if submit_button:
     input_data = {
-        "mos_since_release": int(mos_since_release),
-        "num_grade": int(num_grade),
+        "mos_since_release": mos_since_release,
+        "num_grade": num_grade,
         "is_secret": int(is_secret),  # FastAPI expects boolean 0 or 1
         "is_full_art": int(is_full_art),
         "is_tag_team": int(is_tag_team),
@@ -75,8 +71,6 @@ if submit_button:
         "is_eeveelution": int(is_eeveelution),
         "is_legendary": int(is_legendary),
         "is_og_char": int(is_og_char),
-        "bb_mo_price_by_set": float(bb_mo_price_by_set),
-        "avg_mo_price_by_grade_set": float(avg_mo_price_by_grade_set),
         "ir_score": int(ir_score),
         "num_predictions": int(num_predictions)
     }
@@ -95,14 +89,10 @@ if submit_button:
         st.error(f"An error occurred: {e}")
 
 st.markdown("\n")
-
-agg_for_inputs = df.groupby(["set_name", "grade", "date"])["price"].mean().reset_index(name="avg_mo_price_by_grade_set")
-st.write(agg_for_inputs)
-
-sealed_only = df.loc[df.product_type!="card"]
-agg_for_inputs = sealed_only.groupby(["set_name", "grade", "date"])["bb_mo_price_by_set"].mean().reset_index(name="bb_mo_price_by_set")
-st.write(agg_for_inputs)
-
+title="Feature Importance"
+st.subheader(title)
+image_path = "modules/images/feature_importance.png"
+st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, RSME~=60", use_column_width=True)
 st.markdown("\n")
 
 ##------------------------------------------------------------------------------------------------------------
