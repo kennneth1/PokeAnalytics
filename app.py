@@ -57,7 +57,7 @@ with st.form(key='input_form'):
     num_predictions = st.slider('Number of predictions (2=price change from next month to curr, 3=2 price changes over 3 months, etc)', min_value=2, max_value=11, value=2)
 
     # Submit button for the form
-    submit_button = st.form_submit_button(label='Predict Price Movements')
+    submit_button = st.form_submit_button(label='Predict Price Movements (Coming soon)')
 
 # Convert input data to the appropriate format
 if submit_button:
@@ -76,17 +76,17 @@ if submit_button:
     }
 
     # Send the data to the FastAPI model for prediction
-    try:
-        response = requests.post(fastapi_url, json=input_data)
-        
-        if response.status_code == 200:
-            # Parse and display the result
-            result = response.json()
-            st.write(f"Predicted Price: ${result['price']:.2f}")
-        else:
-            st.error(f"Error: {response.status_code} - {response.text}")
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
+    #try:
+    #    response = requests.post(fastapi_url, json=input_data)
+    #    
+    #    if response.status_code == 200:
+    #        # Parse and display the result
+    #        result = response.json()
+    #        st.write(f"Predicted Price: ${result['price']:.2f}")
+    #    else:
+    #        st.error(f"Error: {response.status_code} - {response.text}")
+    #except Exception as e:
+    #    st.error(f"An error occurred: {e}")
 
 st.markdown("\n")
 title="Feature Importance"
