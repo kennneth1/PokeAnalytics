@@ -40,7 +40,7 @@ filtered_df = clip_sets(filtered_df)
 st.markdown("---")
 title="Price Movement Predictor"
 st.subheader(title)
-st.markdown("(in progress)")
+st.markdown("in progress (card prices are very difficult to predict accurately even month to month due many factors like - hype in the collector space, subjectivity of what the fanbase deems a cool card, and perhaps not enough descriptive features in this model. As such, it is advised to use this tool merely for entertainment purposes or scrappy experimentation)")
 fastapi_url="https://"
 with st.form(key='input_form'):
     # Collecting input from user
