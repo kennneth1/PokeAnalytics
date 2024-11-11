@@ -38,10 +38,9 @@ filtered_df = clip_sets(filtered_df)
 
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-title="Price Movement Predictor (in progress)"
+title="Price Movement Predictor"
 st.subheader(title)
-
-x = """
+st.markdown("(in progress)")
 fastapi_url="https://"
 with st.form(key='input_form'):
     # Collecting input from user
@@ -89,12 +88,16 @@ if submit_button:
     #except Exception as e:
     #    st.error(f"An error occurred: {e}")
 
+# Given user inputs, search df for cards with matching attributes/filters, average, plot and validate    
+# against our [%,%,%,%] and avg % prediction payloads
+# plot here title = "Cards like this performed like"
+
 st.markdown("\n")
 title="Feature Importance"
 st.subheader(title)
 image_path = "modules/images/feature_importance.png"
 #st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, RSME~=60", use_column_width=True)
-"""
+
 st.markdown("\n")
 
 ##------------------------------------------------------------------------------------------------------------
