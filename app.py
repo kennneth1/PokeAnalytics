@@ -39,7 +39,8 @@ filtered_df = clip_sets(filtered_df)
 st.markdown("---")
 title="Price Movement Predictor"
 st.subheader(title)
-st.markdown("in progress (card prices are very difficult to predict accurately even month to month due many factors like - hype in the collector space, subjectivity of what the fanbase deems a cool card, and perhaps not enough descriptive features in this model. As such, it is advised to use this tool merely for entertainment purposes or scrappy experimentation)")
+# (card prices are very difficult to predict accurately even month to month due many factors like - hype in the collector space, subjectivity of what the fanbase deems a cool card, and perhaps not enough descriptive features in this model. As such, it is advised to use this tool merely for entertainment purposes or scrappy experimentation)
+st.markdown("in progress")
 fastapi_url="https://"
 with st.form(key='input_form'):
     # Collecting input from user
@@ -74,7 +75,7 @@ if submit_button:
         "num_predictions": int(num_predictions)
     }
 
-st.markdown("built with XGBoost and FastAPI")
+st.markdown("built with XGBoost and FastAPI, working on deploying with either Heroku or SageMaker endpoints...")
     # Send the data to the FastAPI model for prediction
     #try:
     #    response = requests.post(fastapi_url, json=input_data)
