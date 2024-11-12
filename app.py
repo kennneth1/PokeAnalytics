@@ -243,14 +243,14 @@ st.subheader('Dataframe dtypes and metrics')
 st.write(summary_df)
 
 
-st.subheader('Raw dataset')
-st.write(df)
+#st.subheader('Raw dataset')
+#st.write(df)
 st.markdown("---")
 
 
 
 st.write(" Thanks for visiting!")
-st.write("💡Have ideas or want to collaborate? Feel free to reach out!")
+st.write("💡Have ideas, need data, or want to collaborate? Feel free to reach out!")
 st.write("[LinkedIn](https://www.linkedin.com/in/kennethh123/) | [Github](https://github.com/kennneth1)")
 st.write("— Kenneth H.")
 
