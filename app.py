@@ -74,6 +74,7 @@ if submit_button:
         "num_predictions": int(num_predictions)
     }
 
+st.markdown("built with XGBoost and FastAPI")
     # Send the data to the FastAPI model for prediction
     #try:
     #    response = requests.post(fastapi_url, json=input_data)

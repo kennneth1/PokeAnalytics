@@ -26,5 +26,4 @@ feature_descriptions = {
     "max_mo_price_psa_10_in_set": "Maximum market price of PSA 10 cards per set"
 }
 
-intro_md = "Analytics and AI on modern, Pokémon card price data. The data is scraped using a serverless, AWS pipeline. A price movement predictor can be found below, built with XGBoost and FastAPI. \
-"
+intro_md = "Analytics and AI on modern, Pokémon card price data. The data is scraped using a serverless, AWS pipeline. "
