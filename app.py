@@ -31,7 +31,7 @@ start_formatted = datetime.strptime(start, "%Y-%m").strftime("%m-%Y")
 end_formatted = datetime.strptime(end, "%Y-%m").strftime("%m-%Y")
 # remove 1st 2 months of release data per set
 filtered_df = clip_sets(filtered_df)
-
+filtered_df = filtered_df.loc[filtered_df.price>0]
 
 
 
