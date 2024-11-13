@@ -102,8 +102,11 @@ st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, 
 st.markdown("\n")
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-set_name_filter = st.selectbox("Select Set", df['set_name'].unique())
-filtered_df = df[df['set_name'] == set_name_filter]
+grouped_df = df.groupby('set_name').agg({'price': 'mean'}).reset_index()
+
+# Filter by selected set
+set_name_filter = st.selectbox("Select Set", grouped_df['set_name'].unique())
+filtered_df = grouped_df[grouped_df['set_name'] == set_name_filter]
 
 # Display filtered DataFrame
 st.dataframe(filtered_df)
