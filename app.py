@@ -103,6 +103,9 @@ st.markdown("\n")
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
 st.subheader('Recent 3 month averages')
+
+# Sort by poke_id and date (most recent first)
+# Sort by poke_id and date (most recent first)
 df = df.sort_values(by=['poke_id', 'date'], ascending=[True, False])
 
 # Select the 3 most recent prices for each poke_id
@@ -111,8 +114,8 @@ latest_prices = df.groupby('poke_id').head(3)
 # Calculate the average price for each poke_id, grouped by grade
 avg_prices_per_item = latest_prices.groupby(['poke_id', 'grade']).agg({'price': 'mean'}).reset_index()
 
-# Merge the average price with only the 'poke_name' and 'poke_no' for easy filtering (remove unnecessary columns)
-avg_prices_per_item = avg_prices_per_item.merge(df[['poke_id', 'poke_name', 'poke_no']].drop_duplicates(), on='poke_id')
+# Merge the average price with the original set_name and poke_name for easy filtering
+avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id']].drop_duplicates(), on='poke_id')
 
 # Filter by set_name (no grouping needed here)
 set_name_filter = st.selectbox("Select Set", avg_prices_per_item['set_name'].unique())
@@ -120,6 +123,7 @@ view = avg_prices_per_item[avg_prices_per_item['set_name'] == set_name_filter]
 
 # Display the filtered DataFrame with average prices for each poke_id per Grade and set_name
 st.dataframe(view)
+
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
 st.subheader('Visualizations:')
