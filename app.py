@@ -111,8 +111,8 @@ df = df.sort_values(by=['poke_id', 'date'], ascending=[True, False])
 # Select the 3 most recent prices for each poke_id
 latest_prices = df.groupby('poke_id').head(3)
 
-# Calculate the average price for each poke_id, grouped by Grade
-avg_prices_per_item = latest_prices.groupby(['poke_id', 'Grade']).agg({'price': 'mean'}).reset_index()
+# Calculate the average price for each poke_id, grouped by grade
+avg_prices_per_item = latest_prices.groupby(['poke_id', 'grade']).agg({'price': 'mean'}).reset_index()
 
 # Merge the average price with the original set_name and poke_name for easy filtering
 avg_prices_per_item = avg_prices_per_item.merge(df[['poke_id', 'set_name', 'poke_name']].drop_duplicates(), on='poke_id')
