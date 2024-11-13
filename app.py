@@ -113,18 +113,15 @@ latest_prices = df.groupby('poke_id').head(3)
 # Calculate the average price for each poke_id
 avg_prices_per_item = latest_prices.groupby('poke_id').agg({'price': 'mean'}).reset_index()
 
-# Merge the average price back with the original set_name for easy filtering
+# Merge the average price with the original set_name for easy filtering
 avg_prices_per_item = avg_prices_per_item.merge(df[['poke_id', 'set_name']].drop_duplicates(), on='poke_id')
 
-# Group by set_name and calculate the average price for all items in that set
-avg_prices_per_set = avg_prices_per_item.groupby('set_name').agg({'price': 'mean'}).reset_index()
+# Filter by set_name (no grouping needed here)
+set_name_filter = st.selectbox("Select Set", avg_prices_per_item['set_name'].unique())
+view = avg_prices_per_item[avg_prices_per_item['set_name'] == set_name_filter]
 
-# Filter by selected set
-set_name_filter = st.selectbox("Select Set", avg_prices_per_set['set_name'].unique())
-filtered_df = avg_prices_per_set[avg_prices_per_set['set_name'] == set_name_filter]
-
-# Display filtered DataFrame with average prices for each set
-st.dataframe(filtered_df)
+# Display the filtered DataFrame with average prices for each poke_id per set_name
+st.dataframe(view)
 
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
