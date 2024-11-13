@@ -100,10 +100,19 @@ image_path = "modules/images/feature_importance.png"
 st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, RSME~=60", use_column_width=True)
 
 st.markdown("\n")
+##------------------------------------------------------------------------------------------------------------
+st.markdown("---")
+set_name_filter = st.selectbox("Select Set", df['set_name'].unique())
+filtered_df = df[df['set_name'] == set_name_filter]
+
+# Display filtered DataFrame
+st.dataframe(filtered_df)
+
+
 
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-st.subheader('Visualizing set performance:')
+st.subheader('Visualizations:')
 st.markdown("*Card Price Predictor was trained on a subset of this data* ")
 
 st.markdown(f"""- selected data date range: ({start_formatted} to {end_formatted})\n- data of dimension: {filtered_df.shape}""")
