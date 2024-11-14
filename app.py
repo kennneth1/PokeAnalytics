@@ -6,6 +6,8 @@ from modules.viz import Plotter
 from modules.config import feature_descriptions, intro_md
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import numpy as np
+
 
 st.set_page_config(page_title="Pokémon Market Analysis", layout="centered")
 
@@ -102,39 +104,42 @@ st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, 
 st.markdown("\n")
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
+st.subheader("Price Tracking")
 # Select the 3 most recent prices for each poke_id
-latest_prices = df.groupby(['poke_id', 'grade']).head(3)
+latest_prices = df.groupby(['poke_id', 'grade']).head(3).sort_values("price", ascending=True)
 
 # Aggregate by poke_name, poke_id, grade, and set_name to include the set_name in the result
-last_3mo_avg = latest_prices.groupby(['poke_name', 'poke_id', 'grade', 'set_name']).agg({'price': 'mean'}).reset_index()
+last_3mo_avg = latest_prices.groupby(['poke_name', 'poke_no', 'grade', 'set_name']).agg({'price': 'mean'}).reset_index()
 
 # Calculate the price for the most recent month (first price for each poke_id, grouped by grade)
-last_mo = latest_prices.groupby(['poke_name', 'poke_id', 'grade', 'set_name']).agg({'price': 'first'}).reset_index()
+last_mo = latest_prices.groupby(['poke_name', 'poke_no', 'grade', 'set_name']).agg({'price': 'first'}).reset_index()
 
 # Merge the two DataFrames on poke_name, grade, poke_id, and set_name
-metrics = last_3mo_avg.merge(last_mo, on=["poke_name", "grade", "poke_id", "set_name"])
+metrics = last_3mo_avg.merge(last_mo, on=["poke_name", "grade", "poke_no", "set_name"])
 
 # Rename the columns for clarity
 metrics.rename(columns={'price_x': 'last_3mo_avg_price', 'price_y': 'last_mo_price'}, inplace=True)
 
 # Calculate the percent change between last_3mo_avg_price and last_mo_price
 metrics['perc_change'] = ((metrics['last_mo_price'] - metrics['last_3mo_avg_price']) / metrics['last_3mo_avg_price']) * 100
+metrics['perc_change'].replace([np.inf, -np.inf, np.nan], 0, inplace=True)
 
+# Round the perc_change column to integers
+metrics['perc_change'] = metrics['perc_change'].round(0).astype(int)
 # Filter by set_name (no grouping needed here)
 set_name_filter = st.selectbox("Select Set", metrics['set_name'].unique())
-view = metrics[metrics['set_name'] == set_name_filter]
+grade_filter = st.selectbox("Select Grade", metrics['grade'].unique())
 
-# Display the filtered DataFrame with average prices for each poke_id per Grade and set_name
+view = metrics[(metrics['set_name'] == set_name_filter) & (metrics['grade'] == grade_filter)]
+
+view = view.drop(columns=['set_name'])
+
 st.dataframe(view)
-# TODO: Create column for % change between last 3mo average and last month (Last month price - Last 3 month avg price )/ last 3 month avg price)
-# Display the filtered DataFrame with the new column names
 
-# TODO: For sealed too
-# TODO: Have another view that shows biggest movers overall (group by poke_id), get first (3), avg, compare to lastset month, compare change
 
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-st.subheader('Visualizations:')
+st.subheader('Visualizations')
 st.markdown("*Card Price Predictor was trained on a subset of this data* ")
 
 st.markdown(f"""- selected data date range: ({start_formatted} to {end_formatted})\n- data of dimension: {filtered_df.shape}""")
