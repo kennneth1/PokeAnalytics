@@ -108,35 +108,23 @@ df = df.sort_values(by=['poke_id', 'date'], ascending=[True, False])
 # Select the 3 most recent prices for each poke_id
 latest_prices = df.groupby('poke_id').head(3)
 
-# Calculate the average price for each poke_id, grouped by grade (this will be the 3-month average)
+# Calculate the average price for each poke_id, grouped by grade
 avg_prices_per_item = latest_prices.groupby(['poke_id', 'grade']).agg({'price': 'mean'}).reset_index()
-avg_prices_per_item.rename(columns={'price': 'avg_price_3mo'}, inplace=True)
 
-# Get the first price for each poke_id and grade group (this will be the 1-month price)
-first_prices = latest_prices.groupby(['poke_id', 'grade']).agg({'price': 'first'}).reset_index()
-first_prices.rename(columns={'price': 'avg_price_1mo'}, inplace=True)
+# Merge the average price with the original set_name and poke_name for easy filtering
+avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set_name']].drop_duplicates(), on='poke_id')
 
-# Merge the first price with the average price and the other columns
-avg_prices_per_item = avg_prices_per_item.merge(first_prices, on=['poke_id', 'grade'])
-
-# Merge the average price with the original set_name, poke_name, and release_date for easy filtering
-avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set_name', 'release_date']].drop_duplicates(), on='poke_id')
-
-# Sort the set_name list by release_date, most recent first
-sorted_set_names = avg_prices_per_item[['set_name', 'release_date']].drop_duplicates().sort_values(by='release_date', ascending=False)
-
-# Replace "-" with spaces in set_name before displaying it in the selectbox
-sorted_set_names['set_name'] = sorted_set_names['set_name'].str.replace('-', ' ')
-
-# Get the sorted set names for the selectbox
-set_name_filter = st.selectbox("Select Set", sorted_set_names['set_name'].values)
-
-# Filter the DataFrame by selected set_name
+# Filter by set_name (no grouping needed here)
+set_name_filter = st.selectbox("Select Set", avg_prices_per_item['set_name'].unique())
 view = avg_prices_per_item[avg_prices_per_item['set_name'] == set_name_filter]
 
-# Display the filtered DataFrame with the new column names
+# Display the filtered DataFrame with average prices for each poke_id per Grade and set_name
 st.dataframe(view)
+# TODO: Create column for % change between last 3mo average and last month (Last month price - Last 3 month avg price )/ last 3 month avg price)
+# Display the filtered DataFrame with the new column names
 
+
+# TODO: Have another view that shows biggest movers overall (group by poke_id), get first (3), avg, compare to lastset month, compare change
 
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
