@@ -124,13 +124,13 @@ avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set
 
 # Sort the set_name list by release_date, most recent first
 sorted_set_names = avg_prices_per_item[['set_name', 'release_date']].drop_duplicates().sort_values(by='release_date', ascending=False)
-sorted_set_names['set_name'] = sorted_set_names['set_name'].str.replace('-', ' ')
 
 # Get the sorted set names for the selectbox
 set_name_filter = st.selectbox("Select Set", sorted_set_names['set_name'].values)
 
 # Filter the DataFrame by selected set_name
 view = avg_prices_per_item[avg_prices_per_item['set_name'] == set_name_filter]
+view['set_name'] = view['set_name'].str.replace('-', ' ')
 
 # Display the filtered DataFrame with the new column names
 st.dataframe(view)
