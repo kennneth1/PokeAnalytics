@@ -56,7 +56,7 @@ with st.form(key='input_form'):
     is_legendary = st.checkbox('Legendary (gen1-4)')
     is_og_char = st.checkbox('Nolstagic Favorite (see below)')
     ir_score = st.text_input('Illustration Rare Score (0=NA, 1=IR, 2=SIR)', value="0")
-    num_predictions = st.slider('Num predictions (past the first month)', min_value=2, max_value=11, value=2)
+    num_predictions = st.slider('months to forecast', min_value=1, max_value=11, value=1)
 
     # Submit button for the form
     submit_button = st.form_submit_button(label='Predict Price Movements (Coming soon)')
@@ -74,7 +74,7 @@ if submit_button:
         "is_legendary": int(is_legendary),
         "is_og_char": int(is_og_char),
         "ir_score": int(ir_score),
-        "num_predictions": int(num_predictions)
+        "num_predictions": int(num_predictions)+1
     }
 
 st.markdown("built with XGBoost and FastAPI, deploying with either Heroku or SageMaker endpoints...")
@@ -108,7 +108,7 @@ st.subheader("Price tracking across sets")
 # Select the 3 most recent prices for each poke_id
 #latest_prices = df[df['price'] > 0]
 df = df.sort_values(by='date', ascending=True)
-tmp="""
+
 latest_prices = df.groupby(['poke_id', 'grade']).tail(3)
 
 # Aggregate by poke_name, poke_id, grade, and set_name to include the set_name in the result
@@ -159,13 +159,13 @@ view = view.drop(columns=['set_name', 'release_date'])
 
 # Display the filtered and sorted view in Streamlit
 st.dataframe(view.sort_values("last_mo_price", ascending=False))
-"""
+
 ##-----------------------
-x = """
+
 st.markdown("---")
-st.subheader("Top raw movers over 25 USD")
+st.subheader("Top near mint movers over 25 USD")
 # Select the 3 most recent prices for each poke_id
-raw = df.loc[df.grade=="nearmint"]
+raw = df.loc[(df['grade'] == "nearmint") & (df['product_type'] != "sealed")]
 latest_prices = raw.groupby('poke_id').tail(3)
 # Aggregate by poke_name, poke_id, grade, and set_name to include the set_name in the result
 last_3mo_avg = latest_prices.groupby(['poke_name', 'set_name', 'poke_no']).agg({'price': 'mean'}).reset_index()
@@ -187,10 +187,40 @@ metrics['perc_change'].replace([np.inf, -np.inf, np.nan], 0, inplace=True)
 metrics['perc_change'] = metrics['perc_change'].round(0).astype(int)
 
 top_50 = metrics.loc[metrics.last_mo_price>=25].sort_values("perc_change", ascending=False)
+
 st.dataframe(top_50)
-"""
 
 ##------------------------------------------------------------------------------------------------------------
+
+st.markdown("---")
+st.subheader("Booster boxes")
+# Select the 3 most recent prices for each poke_id
+raw = df.loc[df.poke_name=="booster-box"]
+latest_prices = raw.groupby('poke_id').tail(3)
+# Aggregate by poke_name, poke_id, grade, and set_name to include the set_name in the result
+last_3mo_avg = latest_prices.groupby(['poke_name', 'set_name']).agg({'price': 'mean'}).reset_index()
+
+# Calculate the price for the most recent month (first price for each poke_id, grouped by grade)
+last_mo = latest_prices.groupby(['poke_name', 'set_name', 'poke_no']).agg({'price': 'last'}).reset_index()
+
+# Merge the two DataFrames on poke_name, grade, poke_id, and set_name
+metrics = last_3mo_avg.merge(last_mo, on=["poke_name", 'set_name'])
+
+# Rename the columns for clarity
+metrics.rename(columns={'price_x': 'last_3mo_avg_price', 'price_y': 'last_mo_price'}, inplace=True)
+
+# Calculate the percent change between last_3mo_avg_price and last_mo_price
+metrics['perc_change'] = ((metrics['last_mo_price'] - metrics['last_3mo_avg_price']) / metrics['last_3mo_avg_price']) * 100
+metrics['perc_change'].replace([np.inf, -np.inf, np.nan], 0, inplace=True)
+
+# Round the perc_change column to integers
+metrics['perc_change'] = metrics['perc_change'].round(0).astype(int)
+metrics = metrics.loc[metrics.last_mo_price>=25].sort_values("perc_change", ascending=False)
+
+metrics = metrics.drop(columns=['poke_name', 'poke_no'])
+st.dataframe(metrics)
+
+#------
 st.markdown("---")
 st.subheader('Visualizations')
 st.markdown("*Card Price Predictor was trained on a subset of this data* ")
