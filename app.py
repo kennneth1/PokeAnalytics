@@ -107,6 +107,7 @@ st.markdown("---")
 st.subheader("Price Tracking")
 # Select the 3 most recent prices for each poke_id
 #latest_prices = df[df['price'] > 0]
+df = df.sort_values(by='date', ascending=True)
 latest_prices = df.groupby(['poke_id', 'grade']).tail(3)
 
 # Aggregate by poke_name, poke_id, grade, and set_name to include the set_name in the result
