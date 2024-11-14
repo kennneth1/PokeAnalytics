@@ -77,7 +77,7 @@ if submit_button:
         "num_predictions": int(num_predictions)
     }
 
-st.markdown("built with XGBoost and FastAPI, working on deploying with either Heroku or SageMaker endpoints...")
+st.markdown("built with XGBoost and FastAPI, deploying with either Heroku or SageMaker endpoints...")
     # Send the data to the FastAPI model for prediction
     #try:
     #    response = requests.post(fastapi_url, json=input_data)
