@@ -161,6 +161,7 @@ view = view.drop(columns=['set_name', 'release_date'])
 st.dataframe(view.sort_values("last_mo_price", ascending=False))
 """
 ##-----------------------
+x = """
 st.markdown("---")
 st.subheader("Top raw movers over 25 USD")
 # Select the 3 most recent prices for each poke_id
@@ -187,7 +188,7 @@ metrics['perc_change'] = metrics['perc_change'].round(0).astype(int)
 
 top_50 = metrics.loc[metrics.last_mo_price>=25].sort_values("perc_change", ascending=False)
 st.dataframe(top_50)
-
+"""
 
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
