@@ -125,13 +125,24 @@ avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set
 # Sort the set_name list by release_date, most recent first
 sorted_set_names = avg_prices_per_item[['set_name', 'release_date']].drop_duplicates().sort_values(by='release_date', ascending=False)
 
-# Get the sorted set names for the selectbox
-set_name_filter = st.selectbox("Select Set", sorted_set_names['set_name'].values)
+# Replace "-" with spaces in the set_name for display in the selectbox (but not for filtering)
+sorted_set_names_display = sorted_set_names.copy()
+sorted_set_names_display['set_name'] = sorted_set_names_display['set_name'].str.replace('-', ' ')
 
-# Filter the DataFrame by selected set_name
-view = avg_prices_per_item[avg_prices_per_item['set_name'] == set_name_filter]
+# Get the sorted set names for the selectbox, displaying with spaces instead of hyphens
+set_name_filter = st.selectbox("Select Set", sorted_set_names_display['set_name'].values)
 
-# Display the filtered DataFrame with the new column names
+# Now, filter the original DataFrame using the selected set_name (with hyphens, to match the raw data)
+# Get the raw set_name (with hyphens) corresponding to the selected set_name
+raw_set_name = sorted_set_names[sorted_set_names_display['set_name'] == set_name_filter]['set_name'].values[0]
+
+# Filter the data by the raw set_name (with hyphens)
+view = avg_prices_per_item[avg_prices_per_item['set_name'] == raw_set_name]
+
+# Replace "-" with spaces in the set_name for display in the final DataFrame
+view['set_name'] = view['set_name'].str.replace('-', ' ')
+
+# Display the filtered DataFrame with the new column names and with spaces in set_name
 st.dataframe(view)
 
 
