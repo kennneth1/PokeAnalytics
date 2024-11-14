@@ -106,14 +106,14 @@ st.markdown("\n")
 st.markdown("---")
 st.subheader("Price Tracking")
 # Select the 3 most recent prices for each poke_id
-latest_prices = df.groupby(['poke_id', 'grade']).head(3).sort_values("price", ascending=True)
+#latest_prices = df[df['price'] > 0]
+latest_prices = df.groupby(['poke_id', 'grade']).tail(3)
 
 # Aggregate by poke_name, poke_id, grade, and set_name to include the set_name in the result
 last_3mo_avg = latest_prices.groupby(['poke_name', 'poke_no', 'grade', 'set_name']).agg({'price': 'mean'}).reset_index()
 
 # Calculate the price for the most recent month (first price for each poke_id, grouped by grade)
-last_mo = latest_prices.groupby(['poke_name', 'poke_no', 'grade', 'set_name']).agg({'price': 'first'}).reset_index()
-
+last_mo = latest_prices.groupby(['poke_name', 'poke_no', 'grade', 'set_name']).agg({'price': 'last'}).reset_index()
 # Merge the two DataFrames on poke_name, grade, poke_id, and set_name
 metrics = last_3mo_avg.merge(last_mo, on=["poke_name", "grade", "poke_no", "set_name"])
 
@@ -126,15 +126,64 @@ metrics['perc_change'].replace([np.inf, -np.inf, np.nan], 0, inplace=True)
 
 # Round the perc_change column to integers
 metrics['perc_change'] = metrics['perc_change'].round(0).astype(int)
-# Filter by set_name (no grouping needed here)
-set_name_filter = st.selectbox("Select Set", metrics['set_name'].unique())
-grade_filter = st.selectbox("Select Grade", metrics['grade'].unique())
 
+release_data = df[['set_name', 'release_date']].groupby("set_name").first()
+metrics = metrics.merge(release_data, on='set_name', how='left')
+import pandas as pd
+# Ensure 'release_date' is in datetime format
+metrics['release_date'] = pd.to_datetime(metrics['release_date'])
+
+# Sort the set_name filter by release_date
+sorted_sets = metrics.sort_values('release_date', ascending=False)['set_name'].unique()
+
+# Order the grade filter manually
+grade_order = ['nearmint', 'psa_10', 'psa_9', 'psa_8', 'psa_7', 'bgs_9_half']
+
+# Set 'grade' as a categorical column with the custom order
+metrics['grade'] = pd.Categorical(metrics['grade'], categories=grade_order, ordered=True)
+
+# Now, use the categories to sort the unique values in the 'grade' column
+sorted_grades = metrics['grade'].cat.categories
+
+# Set up Streamlit filters
+set_name_filter = st.selectbox("Select Set", sorted_sets)
+grade_filter = st.selectbox("Select Grade", sorted_grades)
+
+# Filter the view based on selected set_name and grade
 view = metrics[(metrics['set_name'] == set_name_filter) & (metrics['grade'] == grade_filter)]
 
-view = view.drop(columns=['set_name'])
+# Drop the set_name column for clarity in the final display
+view = view.drop(columns=['set_name', 'release_date'])
 
-st.dataframe(view)
+# Display the filtered and sorted view in Streamlit
+st.dataframe(view.sort_values("last_mo_price", ascending=False))
+##-----------------------
+st.markdown("---")
+st.subheader("Top raw movers over 25 USD")
+# Select the 3 most recent prices for each poke_id
+raw = df.loc[df.grade=="nearmint"]
+latest_prices = raw.groupby('poke_id').tail(3)
+# Aggregate by poke_name, poke_id, grade, and set_name to include the set_name in the result
+last_3mo_avg = latest_prices.groupby(['poke_name', 'set_name', 'poke_no']).agg({'price': 'mean'}).reset_index()
+
+# Calculate the price for the most recent month (first price for each poke_id, grouped by grade)
+last_mo = latest_prices.groupby(['poke_name', 'set_name', 'poke_no']).agg({'price': 'last'}).reset_index()
+
+# Merge the two DataFrames on poke_name, grade, poke_id, and set_name
+metrics = last_3mo_avg.merge(last_mo, on=["poke_name", 'set_name', "poke_no"])
+
+# Rename the columns for clarity
+metrics.rename(columns={'price_x': 'last_3mo_avg_price', 'price_y': 'last_mo_price'}, inplace=True)
+
+# Calculate the percent change between last_3mo_avg_price and last_mo_price
+metrics['perc_change'] = ((metrics['last_mo_price'] - metrics['last_3mo_avg_price']) / metrics['last_3mo_avg_price']) * 100
+metrics['perc_change'].replace([np.inf, -np.inf, np.nan], 0, inplace=True)
+
+# Round the perc_change column to integers
+metrics['perc_change'] = metrics['perc_change'].round(0).astype(int)
+
+top_50 = metrics.loc[metrics.last_mo_price>=25].sort_values("perc_change", ascending=False)
+st.dataframe(top_50)
 
 
 ##------------------------------------------------------------------------------------------------------------
@@ -157,7 +206,7 @@ modern_line_plts = Plotter(title="", xlabel="date (monthly)", ylabel="price (USD
 feature = "top10_nm_card_mo_sum_in_set"
 title = "All set card values: sum of top 10 cards" # basically ~= average cost of near mint
 st.subheader(title)
-top10_nm_card_mo_sum_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
+top10_nm_card_mo_sum_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name")
 st.pyplot(top10_nm_card_mo_sum_in_set)
 st.markdown("\n")
 
@@ -167,7 +216,7 @@ winners=winners.loc[winners.date<clipped_tail]
 title = "Mid range sets ($700-1250): sum of top 10 cards"
 st.subheader(title)
 semi_winners = winners[~winners['set_name'].isin(['evolving-skies', 'team-up'])]
-top10_nm_card_mo_sum_in_winning_sets = modern_line_plts.plot_basic(semi_winners, x='date', y=feature, kind="line", hue="set_name", marker='o')
+top10_nm_card_mo_sum_in_winning_sets = modern_line_plts.plot_basic(semi_winners, x='date', y=feature, kind="line", hue="set_name")
 st.pyplot(top10_nm_card_mo_sum_in_winning_sets)
 st.markdown("\n")
 
@@ -176,7 +225,7 @@ baby_sets = agg_by_set_df[agg_by_set_df['set_name'].isin(small_sets)]
 baby_sets = baby_sets.loc[baby_sets.date<=clipped_tail]
 title = "Unripe sets (less than $700): sum of top 10 cards"
 st.subheader(title)
-top10_nm_card_mo_sum_in_winning_sets = modern_line_plts.plot_basic(baby_sets, x='date', y=feature, kind="line", hue="set_name", marker='o')
+top10_nm_card_mo_sum_in_winning_sets = modern_line_plts.plot_basic(baby_sets, x='date', y=feature, kind="line", hue="set_name")
 st.pyplot(top10_nm_card_mo_sum_in_winning_sets)
 st.markdown("\n")
 
@@ -185,7 +234,7 @@ modern_sets = modern_sets.loc[modern_sets.date<clipped_tail]
 agg_modern_sets = agg_by_set(modern_sets)
 title = "Modern sets (2022+ release): sum of top 10 cards"
 st.subheader(title)
-top10_nm_card_mo_sum_modern = modern_line_plts.plot_basic(agg_modern_sets, x='date', y=feature, kind="line", hue="set_name", marker='o')
+top10_nm_card_mo_sum_modern = modern_line_plts.plot_basic(agg_modern_sets, x='date', y=feature, kind="line", hue="set_name")
 st.pyplot(top10_nm_card_mo_sum_modern)
 st.markdown("\n")
 
@@ -196,7 +245,7 @@ feature = "bb_mo_price_by_set"
 title = "All booster boxes: sell prices"
 st.subheader(title)
 exclude_words = ['crown-zenith', 'scarlet-&-violet-151', 'champions-path', 'paldean fates', 'hidden-fates', 'shining-fates']
-bb_mo_price_by_set = modern_line_plts.plot_basic(agg_by_set_df[~agg_by_set_df['set_name'].isin(exclude_words)], x='date', y=feature, kind="line", hue="set_name", marker='o')
+bb_mo_price_by_set = modern_line_plts.plot_basic(agg_by_set_df[~agg_by_set_df['set_name'].isin(exclude_words)], x='date', y=feature, kind="line", hue="set_name")
 st.pyplot(bb_mo_price_by_set)
 st.markdown("\n")
 
@@ -206,7 +255,7 @@ ripe_boxes = agg_by_set_df[agg_by_set_df['set_name'].isin(ripe_boxes_set_names)]
 title = "Matured booster boxes: sell price \$200-$1000"
 exclude_words = ['crown-zenith', 'scarlet-&-violet-151', 'champions-path', 'paldean fates', 'hidden-fates', 'shining-fates']
 st.subheader(title)
-bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(ripe_boxes, x='date', y=feature, kind="line", hue="set_name", marker='o')
+bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(ripe_boxes, x='date', y=feature, kind="line", hue="set_name")
 st.pyplot(bb_mo_price_by_set_ripe)
 st.markdown("\n")
 
@@ -215,7 +264,7 @@ young_boxes_set_names = get_baby_boxes(agg_by_set_df)
 young_boxes = agg_by_set_df[agg_by_set_df['set_name'].isin(young_boxes_set_names)]
 title = "Cheaper booster boxes: sell price <$200"
 st.subheader(title)
-bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(young_boxes, x='date', y=feature, kind="line", hue="set_name", marker='o')
+bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(young_boxes, x='date', y=feature, kind="line", hue="set_name")
 st.pyplot(bb_mo_price_by_set_ripe)
 st.markdown("\n")
 
@@ -226,14 +275,14 @@ title = "Average PSA 10 Price per set"
 st.subheader(title)
 
 feature = 'avg_mo_price_psa_10_in_set'
-avg_mo_price_psa_10_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
+avg_mo_price_psa_10_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name")
 st.pyplot(avg_mo_price_psa_10_in_set)
 st.markdown("\n")
 
 feature = 'avg_mo_price_sealed_in_set'
 title = "Average sealed price per set"
 st.subheader(title)
-avg_mo_price_sealed_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name", marker='o')
+avg_mo_price_sealed_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date', y=feature, kind="line", hue="set_name")
 st.pyplot(avg_mo_price_sealed_in_set)
 st.markdown("\n")
 
@@ -242,7 +291,7 @@ modern_line_plts = Plotter(title="", xlabel="date (monthly)", ylabel="")
 feature = 'top10_mo_card_sum_to_bb_cost_ratio'
 title = "Top 10 card value to Booster box cost ratio"
 st.subheader(title)
-top10_mo_card_sum_to_bb_cost_ratio = modern_line_plts.plot_basic(agg_by_set_df.loc[agg_by_set_df.date>='2022-01'], x='date', y=feature, kind="line", hue="set_name", marker='o')
+top10_mo_card_sum_to_bb_cost_ratio = modern_line_plts.plot_basic(agg_by_set_df.loc[agg_by_set_df.date>='2022-01'], x='date', y=feature, kind="line", hue="set_name")
 st.pyplot(top10_mo_card_sum_to_bb_cost_ratio)
 st.markdown("- i.e. a set with a \$500 total top 10 NM card cost, and a booster box cost of $100, has a ratio of 5.0")
 st.markdown("\n")

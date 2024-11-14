@@ -25,7 +25,7 @@ class Plotter:
         sns.set_style(self.style)
         sns.set_theme(style='darkgrid')
 
-    def plot_basic(self, data, x, y, kind="line", hue=None, marker="o"):
+    def plot_basic(self, data, x, y, kind="line", hue=None, marker=""):
         """
         Plots a basic chart based on the given data and plot type.
 
