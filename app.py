@@ -102,28 +102,30 @@ st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, 
 st.markdown("\n")
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-# Sort by poke_id and date (most recent first)
-df = df.sort_values(by=['poke_id', 'date'], ascending=[True, False])
-
 # Select the 3 most recent prices for each poke_id
-latest_prices = df.groupby('poke_id').head(3)
+latest_prices = df.groupby(['poke_id', 'grade']).head(3)
+last_3mo_avg = latest_prices.groupby(['poke_name', 'poke_id', 'grade']).agg({'price': 'mean'}).reset_index()
 
-# Calculate the average price for each poke_id, grouped by grade
-avg_prices_per_item = latest_prices.groupby(['poke_id', 'grade']).agg({'price': 'mean'}).reset_index()
+# Calculate the price for the most recent month (first price for each poke_id, grouped by grade)
+last_mo = latest_prices.groupby(['poke_name', 'poke_id', 'grade']).agg({'price': 'first'}).reset_index()
 
-# Merge the average price with the original set_name and poke_name for easy filtering
-avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set_name']].drop_duplicates(), on='poke_id')
+# Merge the two DataFrames on poke_id and grade
+metrics = last_3mo_avg.merge(last_mo, on=["poke_name", "grade", "poke_id"])
+
+# Rename the columns for clarity
+metrics.rename(columns={'price_x': 'last_3mo_avg_price', 'price_y': 'last_mo_price'}, inplace=True)
+metrics['perc_change'] = ((metrics['last_mo_price'] - metrics['last_3mo_avg_price']) / metrics['last_3mo_avg_price']) * 100
 
 # Filter by set_name (no grouping needed here)
-set_name_filter = st.selectbox("Select Set", avg_prices_per_item['set_name'].unique())
-view = avg_prices_per_item[avg_prices_per_item['set_name'] == set_name_filter]
+set_name_filter = st.selectbox("Select Set", metrics['set_name'].unique())
+view = metrics[metrics['set_name'] == set_name_filter]
 
 # Display the filtered DataFrame with average prices for each poke_id per Grade and set_name
 st.dataframe(view)
 # TODO: Create column for % change between last 3mo average and last month (Last month price - Last 3 month avg price )/ last 3 month avg price)
 # Display the filtered DataFrame with the new column names
 
-
+# TODO: For sealed too
 # TODO: Have another view that shows biggest movers overall (group by poke_id), get first (3), avg, compare to lastset month, compare change
 
 ##------------------------------------------------------------------------------------------------------------
