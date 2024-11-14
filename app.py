@@ -135,7 +135,6 @@ view = avg_prices_per_item[avg_prices_per_item['set_name'] == set_name_filter]
 st.dataframe(view)
 
 
-
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
 st.subheader('Visualizations:')
