@@ -103,47 +103,37 @@ st.markdown("\n")
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
 # Sort by poke_id and date (most recent first)
-df = df.sort_values(by=['poke_id', 'set_name', 'date'], ascending=[True, True, False])
+df = df.sort_values(by=['poke_id', 'date'], ascending=[True, False])
 
-# Select the 3 most recent prices for each poke_id within each set_name
-latest_prices = df.groupby(['poke_id', 'set_name']).head(3)
+# Select the 3 most recent prices for each poke_id
+latest_prices = df.groupby('poke_id').head(3)
 
-# Calculate the average price for each poke_id within each set_name (3-month average)
-avg_prices_per_item = latest_prices.groupby(['poke_id', 'set_name', 'grade']).agg({'price': 'mean'}).reset_index()
+# Calculate the average price for each poke_id, grouped by grade (this will be the 3-month average)
+avg_prices_per_item = latest_prices.groupby(['poke_id', 'grade']).agg({'price': 'mean'}).reset_index()
 avg_prices_per_item.rename(columns={'price': 'avg_price_3mo'}, inplace=True)
 
-# Get the most recent price (1-month price) for each poke_id within each set_name and grade
-first_prices = df.groupby(['poke_id', 'set_name', 'grade']).agg({'price': 'first'}).reset_index()
+# Get the first price for each poke_id and grade group (this will be the 1-month price)
+first_prices = latest_prices.groupby(['poke_id', 'grade']).agg({'price': 'first'}).reset_index()
 first_prices.rename(columns={'price': 'avg_price_1mo'}, inplace=True)
 
-# Merge the 1-month and 3-month prices together
-avg_prices_per_item = avg_prices_per_item.merge(first_prices, on=['poke_id', 'set_name', 'grade'])
+# Merge the first price with the average price and the other columns
+avg_prices_per_item = avg_prices_per_item.merge(first_prices, on=['poke_id', 'grade'])
 
-# Merge the average prices with the original poke_name, poke_id, and release_date for easy filtering
+# Merge the average price with the original set_name, poke_name, and release_date for easy filtering
 avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set_name', 'release_date']].drop_duplicates(), on='poke_id')
 
 # Sort the set_name list by release_date, most recent first
 sorted_set_names = avg_prices_per_item[['set_name', 'release_date']].drop_duplicates().sort_values(by='release_date', ascending=False)
 
-# Replace "-" with spaces in the set_name for display in the selectbox (but not for filtering)
-sorted_set_names_display = sorted_set_names.copy()
-sorted_set_names_display['set_name'] = sorted_set_names_display['set_name'].str.replace('-', ' ')
+# Get the sorted set names for the selectbox
+set_name_filter = st.selectbox("Select Set", sorted_set_names['set_name'].values)
 
-# Get the sorted set names for the selectbox, displaying with spaces instead of hyphens
-set_name_filter = st.selectbox("Select Set", sorted_set_names_display['set_name'].values)
-
-# Now, filter the original DataFrame using the selected set_name (with hyphens, to match the raw data)
-# Get the raw set_name (with hyphens) corresponding to the selected set_name
-raw_set_name = sorted_set_names[sorted_set_names_display['set_name'] == set_name_filter]['set_name'].values[0]
-
-# Filter the data by the raw set_name (with hyphens)
-view = avg_prices_per_item[avg_prices_per_item['set_name'] == raw_set_name]
-
-# Replace "-" with spaces in the set_name for display in the final DataFrame
-view['set_name'] = view['set_name'].str.replace('-', ' ')
+# Filter the DataFrame by selected set_name
+view = avg_prices_per_item[avg_prices_per_item['set_name'] == set_name_filter]
 
 # Display the filtered DataFrame with the new column names
 st.dataframe(view)
+
 
 
 ##------------------------------------------------------------------------------------------------------------
