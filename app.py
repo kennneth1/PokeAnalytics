@@ -104,7 +104,7 @@ st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, 
 st.markdown("\n")
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-st.subheader("Price Tracking")
+st.subheader("Price tracking across sets")
 # Select the 3 most recent prices for each poke_id
 #latest_prices = df[df['price'] > 0]
 df = df.sort_values(by='date', ascending=True)
