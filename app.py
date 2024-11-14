@@ -102,6 +102,7 @@ st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, 
 st.markdown("\n")
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
+# Sort by poke_id and date (most recent first)
 df = df.sort_values(by=['poke_id', 'date'], ascending=[True, False])
 
 # Select the 3 most recent prices for each poke_id
@@ -118,10 +119,10 @@ first_prices.rename(columns={'price': 'avg_price_1mo'}, inplace=True)
 # Merge the first price with the average price and the other columns
 avg_prices_per_item = avg_prices_per_item.merge(first_prices, on=['poke_id', 'grade'])
 
-# Merge the average price with the original set_name and poke_name for easy filtering
-avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set_name', 'set_year']].drop_duplicates(), on='poke_id')
+# Merge the average price with the original set_name, poke_name, and release_date for easy filtering
+avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set_name', 'release_date']].drop_duplicates(), on='poke_id')
 
-# Sort the set_name list by set_year, most recent first
+# Sort the set_name list by release_date, most recent first
 sorted_set_names = avg_prices_per_item[['set_name', 'release_date']].drop_duplicates().sort_values(by='release_date', ascending=False)
 
 # Get the sorted set names for the selectbox
