@@ -102,8 +102,6 @@ st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, 
 st.markdown("\n")
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-st.subheader('Recent N month averages')
-
 df = df.sort_values(by=['poke_id', 'date'], ascending=[True, False])
 
 # Select the 3 most recent prices for each poke_id
@@ -121,10 +119,15 @@ first_prices.rename(columns={'price': 'avg_price_1mo'}, inplace=True)
 avg_prices_per_item = avg_prices_per_item.merge(first_prices, on=['poke_id', 'grade'])
 
 # Merge the average price with the original set_name and poke_name for easy filtering
-avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set_name']].drop_duplicates(), on='poke_id')
+avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set_name', 'set_year']].drop_duplicates(), on='poke_id')
 
-# Filter by set_name (no grouping needed here)
-set_name_filter = st.selectbox("Select Set", avg_prices_per_item['set_name'].unique())
+# Sort the set_name list by set_year, most recent first
+sorted_set_names = avg_prices_per_item[['set_name', 'set_year']].drop_duplicates().sort_values(by='set_year', ascending=False)
+
+# Get the sorted set names for the selectbox
+set_name_filter = st.selectbox("Select Set", sorted_set_names['set_name'].values)
+
+# Filter the DataFrame by selected set_name
 view = avg_prices_per_item[avg_prices_per_item['set_name'] == set_name_filter]
 
 # Display the filtered DataFrame with the new column names
