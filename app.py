@@ -104,16 +104,20 @@ st.markdown("\n")
 st.markdown("---")
 # Select the 3 most recent prices for each poke_id
 latest_prices = df.groupby(['poke_id', 'grade']).head(3)
-last_3mo_avg = latest_prices.groupby(['poke_name', 'poke_id', 'grade']).agg({'price': 'mean'}).reset_index()
+
+# Aggregate by poke_name, poke_id, grade, and set_name to include the set_name in the result
+last_3mo_avg = latest_prices.groupby(['poke_name', 'poke_id', 'grade', 'set_name']).agg({'price': 'mean'}).reset_index()
 
 # Calculate the price for the most recent month (first price for each poke_id, grouped by grade)
-last_mo = latest_prices.groupby(['poke_name', 'poke_id', 'grade']).agg({'price': 'first'}).reset_index()
+last_mo = latest_prices.groupby(['poke_name', 'poke_id', 'grade', 'set_name']).agg({'price': 'first'}).reset_index()
 
-# Merge the two DataFrames on poke_id and grade
-metrics = last_3mo_avg.merge(last_mo, on=["poke_name", "grade", "poke_id"])
+# Merge the two DataFrames on poke_name, grade, poke_id, and set_name
+metrics = last_3mo_avg.merge(last_mo, on=["poke_name", "grade", "poke_id", "set_name"])
 
 # Rename the columns for clarity
 metrics.rename(columns={'price_x': 'last_3mo_avg_price', 'price_y': 'last_mo_price'}, inplace=True)
+
+# Calculate the percent change between last_3mo_avg_price and last_mo_price
 metrics['perc_change'] = ((metrics['last_mo_price'] - metrics['last_3mo_avg_price']) / metrics['last_3mo_avg_price']) * 100
 
 # Filter by set_name (no grouping needed here)
