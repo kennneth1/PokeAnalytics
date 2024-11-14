@@ -115,7 +115,7 @@ latest_prices = df.groupby('poke_id').head(3)
 avg_prices_per_item = latest_prices.groupby(['poke_id', 'grade']).agg({'price': 'mean'}).reset_index()
 
 # Merge the average price with the original set_name and poke_name for easy filtering
-avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id']].drop_duplicates(), on='poke_id')
+avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set_name']].drop_duplicates(), on='poke_id')
 
 # Filter by set_name (no grouping needed here)
 set_name_filter = st.selectbox("Select Set", avg_prices_per_item['set_name'].unique())
