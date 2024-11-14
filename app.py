@@ -122,7 +122,7 @@ avg_prices_per_item = avg_prices_per_item.merge(first_prices, on=['poke_id', 'gr
 avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set_name', 'set_year']].drop_duplicates(), on='poke_id')
 
 # Sort the set_name list by set_year, most recent first
-sorted_set_names = avg_prices_per_item[['set_name', 'set_year']].drop_duplicates().sort_values(by='set_year', ascending=False)
+sorted_set_names = avg_prices_per_item[['set_name', 'release_date']].drop_duplicates().sort_values(by='release_date', ascending=False)
 
 # Get the sorted set names for the selectbox
 set_name_filter = st.selectbox("Select Set", sorted_set_names['set_name'].values)
