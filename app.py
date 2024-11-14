@@ -102,7 +102,7 @@ st.image(image_path, caption="learning_rate=0.1, max_depth=5, n_estimators=250, 
 st.markdown("\n")
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
-st.subheader('Recent 3 month averages')
+st.subheader('Recent N month averages')
 
 df = df.sort_values(by=['poke_id', 'date'], ascending=[True, False])
 
