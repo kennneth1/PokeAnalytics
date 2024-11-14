@@ -191,17 +191,15 @@ st.dataframe(top_50)
 st.markdown("---")
 st.subheader('Visualizations')
 st.markdown("*Card Price Predictor was trained on a subset of this data* ")
-
 st.markdown(f"""- selected data date range: ({start_formatted} to {end_formatted})\n- data of dimension: {filtered_df.shape}""")
-
 
 last_month = datetime.today()- relativedelta(months=1)
 clipped_tail = last_month.strftime("%Y-%m")
 
-
 ### Set Values
 agg_by_set_df = agg_by_set(filtered_df)
 agg_by_release_df = agg_by_release(filtered_df)
+
 
 modern_line_plts = Plotter(title="", xlabel="date (monthly)", ylabel="price (USD)")
 feature = "top10_nm_card_mo_sum_in_set"
@@ -239,8 +237,8 @@ top10_nm_card_mo_sum_modern = modern_line_plts.plot_basic(agg_modern_sets, x='da
 st.pyplot(top10_nm_card_mo_sum_modern)
 st.markdown("\n")
 
-st.markdown("---")
 
+st.markdown("---")
 ### Booster Boxes
 feature = "bb_mo_price_by_set"
 title = "All booster boxes: sell prices"
@@ -260,7 +258,6 @@ bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(ripe_boxes, x='date', y=fe
 st.pyplot(bb_mo_price_by_set_ripe)
 st.markdown("\n")
 
-
 young_boxes_set_names = get_baby_boxes(agg_by_set_df)
 young_boxes = agg_by_set_df[agg_by_set_df['set_name'].isin(young_boxes_set_names)]
 title = "Cheaper booster boxes: sell price <$200"
@@ -269,8 +266,8 @@ bb_mo_price_by_set_ripe = modern_line_plts.plot_basic(young_boxes, x='date', y=f
 st.pyplot(bb_mo_price_by_set_ripe)
 st.markdown("\n")
 
-st.markdown("---")
 
+st.markdown("---")
 ### --- Other comparisons
 title = "Average PSA 10 Price per set"
 st.subheader(title)
@@ -287,7 +284,6 @@ avg_mo_price_sealed_in_set = modern_line_plts.plot_basic(agg_by_set_df, x='date'
 st.pyplot(avg_mo_price_sealed_in_set)
 st.markdown("\n")
 
-
 modern_line_plts = Plotter(title="", xlabel="date (monthly)", ylabel="")
 feature = 'top10_mo_card_sum_to_bb_cost_ratio'
 title = "Top 10 card value to Booster box cost ratio"
@@ -297,8 +293,8 @@ st.pyplot(top10_mo_card_sum_to_bb_cost_ratio)
 st.markdown("- i.e. a set with a \$500 total top 10 NM card cost, and a booster box cost of $100, has a ratio of 5.0")
 st.markdown("\n")
 
-st.markdown("---")
 
+st.markdown("---")
 # deduplicate and copy
 print(f'...saving copy of deduped data (by poke_id & set_year) to analyze later...starting with {len(df)} rows')
 unique_df = filtered_df.drop_duplicates(subset=['poke_name', "poke_id", 'set_year'], keep='first')
@@ -322,19 +318,14 @@ plotter = Plotter(title="Card Type Histogram", xlabel="Card Type", ylabel="Frequ
 fig = plotter.plot_histogram(data=card_types, x='card_type', weights_column='count', bins=10)
 st.pyplot(fig)
 
+
 st.markdown("---")
-
-
 st.subheader('Dataframe dtypes and metrics')
 st.write(summary_df)
 
 
-#st.subheader('Raw dataset')
-#st.write(df)
+
 st.markdown("---")
-
-
-
 st.write(" Thanks for visiting!")
 st.write("💡Have ideas, need data, or want to collaborate? Feel free to reach out!")
 st.write("[LinkedIn](https://www.linkedin.com/in/kennethh123/) | [Github](https://github.com/kennneth1)")
