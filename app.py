@@ -108,6 +108,7 @@ st.subheader("Price tracking across sets")
 # Select the 3 most recent prices for each poke_id
 #latest_prices = df[df['price'] > 0]
 df = df.sort_values(by='date', ascending=True)
+tmp="""
 latest_prices = df.groupby(['poke_id', 'grade']).tail(3)
 
 # Aggregate by poke_name, poke_id, grade, and set_name to include the set_name in the result
@@ -158,6 +159,7 @@ view = view.drop(columns=['set_name', 'release_date'])
 
 # Display the filtered and sorted view in Streamlit
 st.dataframe(view.sort_values("last_mo_price", ascending=False))
+"""
 ##-----------------------
 st.markdown("---")
 st.subheader("Top raw movers over 25 USD")
