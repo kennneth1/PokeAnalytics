@@ -103,23 +103,23 @@ st.markdown("\n")
 ##------------------------------------------------------------------------------------------------------------
 st.markdown("---")
 # Sort by poke_id and date (most recent first)
-df = df.sort_values(by=['poke_id', 'date'], ascending=[True, False])
+df = df.sort_values(by=['poke_id', 'set_name', 'date'], ascending=[True, True, False])
 
-# Select the 3 most recent prices for each poke_id (this will be the 3-month data)
-latest_prices = df.groupby('poke_id').head(3)
+# Select the 3 most recent prices for each poke_id within each set_name
+latest_prices = df.groupby(['poke_id', 'set_name']).head(3)
 
-# Calculate the average price for each poke_id, grouped by grade (3-month average)
-avg_prices_per_item = latest_prices.groupby(['poke_id', 'grade']).agg({'price': 'mean'}).reset_index()
+# Calculate the average price for each poke_id within each set_name (3-month average)
+avg_prices_per_item = latest_prices.groupby(['poke_id', 'set_name', 'grade']).agg({'price': 'mean'}).reset_index()
 avg_prices_per_item.rename(columns={'price': 'avg_price_3mo'}, inplace=True)
 
-# Get the most recent price (1-month price) for each poke_id and grade group
-first_prices = df.groupby(['poke_id', 'grade']).agg({'price': 'first'}).reset_index()
+# Get the most recent price (1-month price) for each poke_id within each set_name and grade
+first_prices = df.groupby(['poke_id', 'set_name', 'grade']).agg({'price': 'first'}).reset_index()
 first_prices.rename(columns={'price': 'avg_price_1mo'}, inplace=True)
 
-# Merge the 3-month average price with the 1-month price and the other columns
-avg_prices_per_item = avg_prices_per_item.merge(first_prices, on=['poke_id', 'grade'])
+# Merge the 1-month and 3-month prices together
+avg_prices_per_item = avg_prices_per_item.merge(first_prices, on=['poke_id', 'set_name', 'grade'])
 
-# Merge the average prices with the original set_name, poke_name, and release_date for easy filtering
+# Merge the average prices with the original poke_name, poke_id, and release_date for easy filtering
 avg_prices_per_item = avg_prices_per_item.merge(df[['poke_name', 'poke_id', 'set_name', 'release_date']].drop_duplicates(), on='poke_id')
 
 # Sort the set_name list by release_date, most recent first
