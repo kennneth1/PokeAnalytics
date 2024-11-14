@@ -130,7 +130,6 @@ set_name_filter = st.selectbox("Select Set", sorted_set_names['set_name'].values
 
 # Filter the DataFrame by selected set_name
 view = avg_prices_per_item[avg_prices_per_item['set_name'] == set_name_filter]
-view['set_name'] = view['set_name'].str.replace('-', ' ')
 
 # Display the filtered DataFrame with the new column names
 st.dataframe(view)
