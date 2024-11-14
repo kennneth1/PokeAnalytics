@@ -54,9 +54,9 @@ with st.form(key='input_form'):
     is_alt_art = st.checkbox('Alt Art')
     is_eeveelution = st.checkbox('Eeveelution')
     is_legendary = st.checkbox('Legendary (gen1-4)')
-    is_og_char = st.checkbox('Charizard, Blastoise, Venusaur, Gengar, Alakazam, Snorlax, Pikachu, Dragonite, or Gyarados')
-    ir_score = st.text_input('Illustration Rare Score (0=NA, 1=IR, 3=SIR)', value="0")
-    num_predictions = st.slider('Number of predictions (2=price change from next month to curr, 3=2 price changes over 3 months, etc)', min_value=2, max_value=11, value=2)
+    is_og_char = st.checkbox('Nolstagic Favorite (see below)')
+    ir_score = st.text_input('Illustration Rare Score (0=NA, 1=IR, 2=SIR)', value="0")
+    num_predictions = st.slider('Num predictions (past the first month)', min_value=2, max_value=11, value=2)
 
     # Submit button for the form
     submit_button = st.form_submit_button(label='Predict Price Movements (Coming soon)')
